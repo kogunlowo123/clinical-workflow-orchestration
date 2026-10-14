@@ -1,0 +1,194 @@
+{
+  "$defs": {
+    "ActivityKind": {
+      "enum": [
+        "follow-up",
+        "lab",
+        "referral",
+        "medication",
+        "education",
+        "monitoring"
+      ],
+      "title": "ActivityKind",
+      "type": "string"
+    },
+    "MedicationAction": {
+      "enum": [
+        "start",
+        "stop",
+        "continue",
+        "adjust"
+      ],
+      "title": "MedicationAction",
+      "type": "string"
+    },
+    "MedicationProposal": {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "$ref": "#/$defs/MedicationAction"
+        },
+        "display": {
+          "description": "Drug, strength and form",
+          "maxLength": 200,
+          "minLength": 2,
+          "title": "Display",
+          "type": "string"
+        },
+        "existing_request_id": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z0-9\\-.]{1,64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Required for stop/continue/adjust: the active MedicationRequest id",
+          "title": "Existing Request Id"
+        },
+        "rxnorm_code": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9]{1,10}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rxnorm Code"
+        }
+      },
+      "required": [
+        "action",
+        "display"
+      ],
+      "title": "MedicationProposal",
+      "type": "object"
+    },
+    "Priority": {
+      "enum": [
+        "routine",
+        "urgent",
+        "asap",
+        "stat"
+      ],
+      "title": "Priority",
+      "type": "string"
+    },
+    "ProposedActivity": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "anyOf": [
+            {
+              "maxLength": 32,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "LOINC code for labs, SNOMED for others",
+          "title": "Code"
+        },
+        "description": {
+          "maxLength": 500,
+          "minLength": 3,
+          "title": "Description",
+          "type": "string"
+        },
+        "due_in_days": {
+          "maximum": 365,
+          "minimum": 0,
+          "title": "Due In Days",
+          "type": "integer"
+        },
+        "kind": {
+          "$ref": "#/$defs/ActivityKind"
+        },
+        "medication": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MedicationProposal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "priority": {
+          "$ref": "#/$defs/Priority",
+          "default": "routine"
+        },
+        "reason_refs": {
+          "default": [],
+          "description": "Ids of Conditions or Observations in the evidence that justify the activity",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 10,
+          "title": "Reason Refs",
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "description",
+        "due_in_days"
+      ],
+      "title": "ProposedActivity",
+      "type": "object"
+    }
+  },
+  "$id": "https://github.com/kogunlowo123/clinical-workflow-orchestration/schemas/care-plan-proposal.model-output.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "The JSON object the care-coordination model must return.",
+  "properties": {
+    "activities": {
+      "items": {
+        "$ref": "#/$defs/ProposedActivity"
+      },
+      "maxItems": 25,
+      "minItems": 1,
+      "title": "Activities",
+      "type": "array"
+    },
+    "goals": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 10,
+      "minItems": 1,
+      "title": "Goals",
+      "type": "array"
+    },
+    "rationale": {
+      "maxLength": 4000,
+      "minLength": 10,
+      "title": "Rationale",
+      "type": "string"
+    },
+    "title": {
+      "maxLength": 200,
+      "minLength": 3,
+      "title": "Title",
+      "type": "string"
+    }
+  },
+  "required": [
+    "title",
+    "goals",
+    "activities",
+    "rationale"
+  ],
+  "title": "CarePlanProposal",
+  "type": "object"
+}

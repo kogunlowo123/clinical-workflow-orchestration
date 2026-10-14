@@ -1,0 +1,144 @@
+{{- /*
+StatefulSet so each replica owns a persistent volume for its own signed audit
+chain (/var/lib/clinical-workflow/audit/<pod>.jsonl). A log shipper copies the
+files to the immutable storage provisioned by Terraform. Workflow state lives
+in PostgreSQL, so any replica can advance any workflow (database leases).
+*/ -}}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "cwo.fullname" . }}
+  labels: {{- include "cwo.labels" . | nindent 4 }}
+spec:
+  serviceName: {{ include "cwo.fullname" . }}-headless
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  podManagementPolicy: Parallel
+  selector:
+    matchLabels: {{- include "cwo.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "cwo.selectorLabels" . | nindent 8 }}
+        {{- with .Values.podLabels }}{{ toYaml . | nindent 8 }}{{ end }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    spec:
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      {{- with .Values.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- range . }}
+        - {{- toYaml . | nindent 10 }}
+          labelSelector:
+            matchLabels: {{- include "cwo.selectorLabels" $ | nindent 14 }}
+        {{- end }}
+      {{- end }}
+      containers:
+        - name: orchestrator
+          image: {{ include "cwo.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: {{ include "cwo.fullname" . }}
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: CWO_AUDIT_LOG_PATH
+              value: /var/lib/clinical-workflow/audit/$(POD_NAME).jsonl
+            - name: CWO_DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.database }}
+                  key: DATABASE_URL
+            - name: CWO_AZURE_OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.modelKeys }}
+                  key: AZURE_OPENAI_API_KEY
+            - name: CWO_FORWARDED_ALLOW_IPS
+              value: "*"
+          readinessProbe:
+            httpGet: {path: /readyz, port: http}
+            periodSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            httpGet: {path: /healthz, port: http}
+            periodSeconds: 20
+            failureThreshold: 3
+          startupProbe:
+            httpGet: {path: /healthz, port: http}
+            periodSeconds: 5
+            failureThreshold: 24
+          resources: {{- toYaml .Values.resources | nindent 12 }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: signing-key
+              mountPath: /etc/clinical-workflow/signing
+              readOnly: true
+            - name: smart-key
+              mountPath: /etc/clinical-workflow/smart
+              readOnly: true
+            - name: fabric-token
+              mountPath: /var/run/secrets/tokens
+              readOnly: true
+            - name: audit
+              mountPath: /var/lib/clinical-workflow/audit
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: signing-key
+          secret:
+            secretName: {{ .Values.secrets.signingKey }}
+            defaultMode: 0400
+        - name: smart-key
+          secret:
+            secretName: {{ .Values.secrets.smartKey }}
+            defaultMode: 0400
+        # Short-lived projected token the orchestrator exchanges at the identity
+        # fabric (RFC 7523) for its agent credential; rotated by the kubelet.
+        - name: fabric-token
+          projected:
+            defaultMode: 0400
+            sources:
+              - serviceAccountToken:
+                  path: identity-fabric
+                  audience: {{ .Values.cwo.identityFabric.tokenAudience }}
+                  expirationSeconds: 3600
+        - name: tmp
+          emptyDir:
+            sizeLimit: 64Mi
+      {{- with .Values.nodeSelector }}
+      nodeSelector: {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations: {{- toYaml . | nindent 8 }}
+      {{- end }}
+  volumeClaimTemplates:
+    - metadata:
+        name: audit
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        {{- with .Values.audit.storageClassName }}
+        storageClassName: {{ . }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.audit.size }}

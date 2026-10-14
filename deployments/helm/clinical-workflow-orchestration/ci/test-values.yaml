@@ -1,0 +1,35 @@
+# Values used by CI to render and schema-validate the chart (helm lint,
+# helm template | kubeconform). They describe a complete, valid deployment.
+cwo:
+  publicUrl: https://cwo.clinical.ci.internal
+  agentId: spiffe://agents.ci.internal/agent/clinical/orchestrator
+  fhir:
+    baseUrl: https://ehr.ci.internal/fhir/r4
+    smartClientId: clinical-workflow-orchestration
+    smartKeyId: smart-2026-10
+    identifierSystem: https://cwo.clinical.ci.internal/identifiers
+  users:
+    issuer: https://login.ci.internal/tenant/v2.0
+    audience: api://clinical-workflow-orchestration
+    jwksUrl: https://login.ci.internal/tenant/discovery/v2.0/keys
+  identityFabric:
+    url: https://identity.agents.ci.internal
+  models:
+    azureOpenAI:
+      endpoint: https://aoai-clinical.ci.internal
+      deployment: care-plans
+      model: gpt-4o
+      region: eastus2
+      inputCostPerMtok: "2.5"
+      outputCostPerMtok: "10"
+    selfHosted:
+      url: http://vllm.models.svc.cluster.local:8000
+      model: llama-3.1-70b-instruct
+secrets:
+  signingKeyFile: cwo-2026-10.pem
+ingress:
+  enabled: true
+  className: nginx
+  host: cwo.clinical.ci.internal
+serviceMonitor:
+  enabled: true

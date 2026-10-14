@@ -1,0 +1,95 @@
+{
+  "$defs": {
+    "MedicationAction": {
+      "enum": [
+        "start",
+        "stop",
+        "continue",
+        "adjust"
+      ],
+      "title": "MedicationAction",
+      "type": "string"
+    },
+    "MedicationProposal": {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "$ref": "#/$defs/MedicationAction"
+        },
+        "display": {
+          "description": "Drug, strength and form",
+          "maxLength": 200,
+          "minLength": 2,
+          "title": "Display",
+          "type": "string"
+        },
+        "existing_request_id": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z0-9\\-.]{1,64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Required for stop/continue/adjust: the active MedicationRequest id",
+          "title": "Existing Request Id"
+        },
+        "rxnorm_code": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9]{1,10}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rxnorm Code"
+        }
+      },
+      "required": [
+        "action",
+        "display"
+      ],
+      "title": "MedicationProposal",
+      "type": "object"
+    }
+  },
+  "$id": "https://github.com/kogunlowo123/clinical-workflow-orchestration/schemas/skill.check-medication-safety.input.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "patient_id": {
+      "title": "Patient Id",
+      "type": "string"
+    },
+    "proposals": {
+      "items": {
+        "$ref": "#/$defs/MedicationProposal"
+      },
+      "maxItems": 25,
+      "minItems": 1,
+      "title": "Proposals",
+      "type": "array"
+    },
+    "purpose_of_use": {
+      "enum": [
+        "TREAT",
+        "HOPERAT"
+      ],
+      "title": "Purpose Of Use",
+      "type": "string"
+    }
+  },
+  "required": [
+    "patient_id",
+    "purpose_of_use",
+    "proposals"
+  ],
+  "title": "CheckMedicationsInput",
+  "type": "object"
+}

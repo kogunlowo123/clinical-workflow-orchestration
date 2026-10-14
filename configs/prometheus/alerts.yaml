@@ -1,0 +1,120 @@
+# PrometheusRule-compatible alert rules. Load with the Prometheus Operator
+# (wrap in a PrometheusRule) or a rule_files entry.
+# SLOs (docs/architecture/agent-specification.md):
+#   availability  99.9% of API requests succeed (non-5xx)
+#   latency       p95 read endpoints < 300 ms
+#   timeliness    95% of workflows reach awaiting_approval within 5 minutes
+#   safety        0 EHR writes without a clinician sign-off (enforced in code and policy)
+groups:
+  - name: clinical-workflow-orchestration.slo
+    rules:
+      - record: cwo:request_errors:ratio_5m
+        expr: |
+          sum(rate(cwo_http_request_duration_seconds_count{status=~"5.."}[5m]))
+          /
+          clamp_min(sum(rate(cwo_http_request_duration_seconds_count[5m])), 1e-9)
+
+      - alert: CwoErrorBudgetBurnFast
+        expr: cwo:request_errors:ratio_5m > (14.4 * 0.001)
+        for: 5m
+        labels: {severity: page}
+        annotations:
+          summary: Clinical workflow API burning its error budget 14x faster than sustainable
+          runbook: docs/runbooks/incident-response.md#elevated-5xx
+
+      - alert: CwoReadLatencyHigh
+        expr: |
+          histogram_quantile(0.95, sum by (le) (
+            rate(cwo_http_request_duration_seconds_bucket{method="GET",route=~"/v1/workflows.*"}[5m])
+          )) > 0.3
+        for: 10m
+        labels: {severity: ticket}
+        annotations:
+          summary: p95 workflow read latency above 300 ms
+          runbook: docs/runbooks/monitoring.md#latency
+
+      - alert: CwoStepFailuresRising
+        expr: |
+          sum by (step) (rate(cwo_workflow_step_duration_seconds_count{outcome="failure"}[15m]))
+          /
+          clamp_min(sum by (step) (rate(cwo_workflow_step_duration_seconds_count[15m])), 1e-9) > 0.1
+        for: 15m
+        labels: {severity: page}
+        annotations:
+          summary: More than 10% of {{ $labels.step }} steps are failing
+          runbook: docs/runbooks/incident-response.md#step-failures
+
+      - alert: CwoDraftingSlow
+        expr: |
+          histogram_quantile(0.95, sum by (le) (
+            rate(cwo_workflow_step_duration_seconds_bucket{step="drafting",outcome="success"}[15m])
+          )) > 120
+        for: 15m
+        labels: {severity: ticket}
+        annotations:
+          summary: p95 care-plan drafting above 2 minutes (model latency or failover)
+          runbook: docs/runbooks/monitoring.md#model-latency
+
+  - name: clinical-workflow-orchestration.dependencies
+    rules:
+      - alert: CwoFhirErrors
+        expr: |
+          sum(rate(cwo_fhir_requests_total{outcome=~"5..|transport_error|429"}[10m]))
+          /
+          clamp_min(sum(rate(cwo_fhir_requests_total[10m])), 1e-9) > 0.05
+        for: 10m
+        labels: {severity: page}
+        annotations:
+          summary: More than 5% of FHIR requests failing; workflows will queue for retry
+          runbook: docs/runbooks/incident-response.md#ehr-unavailable
+
+      - alert: CwoModelFailover
+        expr: sum(rate(cwo_model_attempts_total{provider="azure-openai",outcome!="success"}[10m])) > 0.1
+        for: 10m
+        labels: {severity: ticket}
+        annotations:
+          summary: Primary model failing; traffic served by the in-cluster fallback
+          runbook: docs/runbooks/incident-response.md#model-outage
+
+      - alert: CwoModelSpendHigh
+        expr: sum(increase(cwo_model_cost_usd_total[1h])) > 50
+        labels: {severity: ticket}
+        annotations:
+          summary: Model spend above 50 USD in the last hour
+          runbook: docs/runbooks/monitoring.md#cost
+
+  - name: clinical-workflow-orchestration.safety
+    rules:
+      - alert: CwoContentGuardBlocked
+        expr: sum(increase(cwo_workflow_failures_total{code="security_violation"}[15m])) > 0
+        labels: {severity: page}
+        annotations:
+          summary: Record content or model output blocked by the content guard (possible prompt injection)
+          runbook: docs/runbooks/incident-response.md#security-violation
+
+      - alert: CwoSignoffDenialsSpike
+        expr: sum(rate(cwo_policy_decisions_total{action=~"careplan:.*",decision="deny"}[30m])) > 0.05
+        for: 15m
+        labels: {severity: ticket}
+        annotations:
+          summary: Clinicians repeatedly blocked at sign-off; check role mapping and acknowledgements
+          runbook: docs/runbooks/incident-response.md#signoff-denials
+
+      - alert: CwoAgentDenySpike
+        expr: |
+          sum(rate(cwo_inbound_agent_decisions_total{decision="deny"}[10m]))
+          /
+          clamp_min(sum(rate(cwo_inbound_agent_decisions_total[10m])), 1e-9) > 0.2
+        for: 15m
+        labels: {severity: page}
+        annotations:
+          summary: More than 20% of agent calls denied; possible misconfiguration or misuse
+          runbook: docs/runbooks/incident-response.md#agent-denials
+
+      - alert: CwoNotReady
+        expr: sum(up{job="clinical-workflow-orchestration"}) < 2
+        for: 5m
+        labels: {severity: page}
+        annotations:
+          summary: Fewer than two orchestrator replicas are being scraped
+          runbook: docs/runbooks/incident-response.md#replicas-down

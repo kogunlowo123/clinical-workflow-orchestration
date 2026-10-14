@@ -1,0 +1,27 @@
+{
+  "$id": "https://github.com/kogunlowo123/clinical-workflow-orchestration/schemas/skill.list-pending-approvals.input.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "limit": {
+      "default": 20,
+      "maximum": 100,
+      "minimum": 1,
+      "title": "Limit",
+      "type": "integer"
+    },
+    "purpose_of_use": {
+      "enum": [
+        "TREAT",
+        "HOPERAT"
+      ],
+      "title": "Purpose Of Use",
+      "type": "string"
+    }
+  },
+  "required": [
+    "purpose_of_use"
+  ],
+  "title": "ListPendingInput",
+  "type": "object"
+}

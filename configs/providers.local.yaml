@@ -1,0 +1,14 @@
+# Local development stack (docker-compose.yml): a model served by the
+# Ollama container through its OpenAI-compatible API. Nothing leaves the
+# workstation; the data is synthetic.
+providers:
+  - kind: openai_compatible
+    profile:
+      name: local-ollama
+      model: llama3.1:8b
+      max_classification: 3
+      max_context_tokens: 32000
+      tasks: [care-plan-draft, clinical-review]
+    base_url: http://ollama:11434
+    auth: none
+    timeout_s: 300

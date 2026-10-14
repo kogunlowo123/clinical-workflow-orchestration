@@ -1,0 +1,17 @@
+{
+  "$id": "https://github.com/kogunlowo123/clinical-workflow-orchestration/schemas/start-workflow.request.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "encounter_id": {
+      "description": "FHIR Encounter id the care plan follows from",
+      "title": "Encounter Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "encounter_id"
+  ],
+  "title": "StartWorkflowRequest",
+  "type": "object"
+}

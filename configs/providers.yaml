@@ -1,0 +1,43 @@
+# Model providers for care-plan drafting (task care-plan-draft) and clinical
+# review (task clinical-review). Every request is labelled RESTRICTED (PHI),
+# so only deployments approved for PHI under a business associate agreement
+# may be listed, each with max_classification 3.
+#
+# Deployment-specific values are ${VARIABLES} resolved from the environment
+# at start-up; the service refuses to start if any is unset. Credentials are
+# referenced by environment variable name only (populated from Key Vault by
+# External Secrets).
+#
+# Primary: Azure OpenAI in the deployment's region. Fallback: a model served
+# in-cluster by vLLM (OpenAI-compatible API), so PHI never leaves the tenant
+# when the primary is unavailable.
+providers:
+  - kind: openai_compatible
+    profile:
+      name: azure-openai
+      model: ${CWO_AZURE_OPENAI_MODEL}
+      max_classification: 3
+      input_cost_per_mtok: ${CWO_AZURE_OPENAI_INPUT_COST_PER_MTOK}
+      output_cost_per_mtok: ${CWO_AZURE_OPENAI_OUTPUT_COST_PER_MTOK}
+      max_context_tokens: 128000
+      tasks: [care-plan-draft, clinical-review]
+      region: ${CWO_AZURE_REGION}
+    base_url: ${CWO_AZURE_OPENAI_ENDPOINT}
+    path: /openai/deployments/${CWO_AZURE_OPENAI_DEPLOYMENT}/chat/completions
+    query:
+      api-version: "2024-10-21"
+    auth: api-key
+    api_key_env: CWO_AZURE_OPENAI_API_KEY
+    send_model: false
+    timeout_s: 60
+
+  - kind: openai_compatible
+    profile:
+      name: in-cluster-vllm
+      model: ${CWO_SELF_HOSTED_MODEL}
+      max_classification: 3
+      max_context_tokens: 32000
+      tasks: [care-plan-draft, clinical-review]
+    base_url: ${CWO_SELF_HOSTED_LLM_URL}
+    auth: none
+    timeout_s: 120

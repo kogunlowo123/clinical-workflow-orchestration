@@ -1,0 +1,521 @@
+{
+  "$defs": {
+    "AllergyFact": {
+      "properties": {
+        "clinical_status": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Clinical Status"
+        },
+        "code": {
+          "$ref": "#/$defs/CodeableConcept"
+        },
+        "criticality": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Criticality"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "reactions": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Reactions",
+          "type": "array"
+        },
+        "verification_status": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Verification Status"
+        }
+      },
+      "required": [
+        "id",
+        "code",
+        "criticality",
+        "clinical_status",
+        "verification_status"
+      ],
+      "title": "AllergyFact",
+      "type": "object"
+    },
+    "CodeableConcept": {
+      "properties": {
+        "coding": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Coding"
+          },
+          "title": "Coding",
+          "type": "array"
+        },
+        "text": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Text"
+        }
+      },
+      "title": "CodeableConcept",
+      "type": "object"
+    },
+    "Coding": {
+      "properties": {
+        "code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Code"
+        },
+        "display": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Display"
+        },
+        "system": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "System"
+        }
+      },
+      "title": "Coding",
+      "type": "object"
+    },
+    "ConditionFact": {
+      "properties": {
+        "clinical_status": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Clinical Status"
+        },
+        "code": {
+          "$ref": "#/$defs/CodeableConcept"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "onset": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Onset"
+        }
+      },
+      "required": [
+        "id",
+        "code",
+        "clinical_status",
+        "onset"
+      ],
+      "title": "ConditionFact",
+      "type": "object"
+    },
+    "EncounterFact": {
+      "properties": {
+        "class_code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Class Code"
+        },
+        "discharge_disposition": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Discharge Disposition"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "period_end": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Period End"
+        },
+        "period_start": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Period Start"
+        },
+        "status": {
+          "title": "Status",
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/$defs/CodeableConcept"
+        }
+      },
+      "required": [
+        "id",
+        "status",
+        "class_code",
+        "type",
+        "period_start",
+        "period_end",
+        "discharge_disposition"
+      ],
+      "title": "EncounterFact",
+      "type": "object"
+    },
+    "MedicationFact": {
+      "properties": {
+        "authored_on": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Authored On"
+        },
+        "dosage": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Dosage"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "medication": {
+          "$ref": "#/$defs/CodeableConcept"
+        },
+        "status": {
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "medication",
+        "status",
+        "dosage",
+        "authored_on"
+      ],
+      "title": "MedicationFact",
+      "type": "object"
+    },
+    "ObservationFact": {
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/CodeableConcept"
+        },
+        "effective": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Effective"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "interpretation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Interpretation"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Unit"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "id",
+        "code",
+        "value",
+        "unit",
+        "effective",
+        "interpretation"
+      ],
+      "title": "ObservationFact",
+      "type": "object"
+    },
+    "OpenWorkFact": {
+      "description": "An existing active CarePlan or open Task, so drafts do not duplicate work.",
+      "properties": {
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "resource_type": {
+          "title": "Resource Type",
+          "type": "string"
+        },
+        "status": {
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "resource_type",
+        "status",
+        "description"
+      ],
+      "title": "OpenWorkFact",
+      "type": "object"
+    },
+    "SourceDigest": {
+      "properties": {
+        "digest": {
+          "title": "Digest",
+          "type": "string"
+        },
+        "reference": {
+          "title": "Reference",
+          "type": "string"
+        },
+        "version_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Version Id"
+        }
+      },
+      "required": [
+        "reference",
+        "digest"
+      ],
+      "title": "SourceDigest",
+      "type": "object"
+    }
+  },
+  "$id": "https://github.com/kogunlowo123/clinical-workflow-orchestration/schemas/evidence-packet.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "age_band": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Age Band"
+    },
+    "allergies": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/AllergyFact"
+      },
+      "title": "Allergies",
+      "type": "array"
+    },
+    "conditions": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ConditionFact"
+      },
+      "title": "Conditions",
+      "type": "array"
+    },
+    "encounter": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/EncounterFact"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "medications": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/MedicationFact"
+      },
+      "title": "Medications",
+      "type": "array"
+    },
+    "observations": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ObservationFact"
+      },
+      "title": "Observations",
+      "type": "array"
+    },
+    "open_work": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/OpenWorkFact"
+      },
+      "title": "Open Work",
+      "type": "array"
+    },
+    "patient_id": {
+      "title": "Patient Id",
+      "type": "string"
+    },
+    "retrieved_at": {
+      "format": "date-time",
+      "title": "Retrieved At",
+      "type": "string"
+    },
+    "retrieved_by": {
+      "title": "Retrieved By",
+      "type": "string"
+    },
+    "sex": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Sex"
+    },
+    "sources": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/SourceDigest"
+      },
+      "title": "Sources",
+      "type": "array"
+    }
+  },
+  "required": [
+    "patient_id",
+    "age_band",
+    "sex",
+    "encounter",
+    "retrieved_at",
+    "retrieved_by"
+  ],
+  "title": "EvidencePacket",
+  "type": "object"
+}

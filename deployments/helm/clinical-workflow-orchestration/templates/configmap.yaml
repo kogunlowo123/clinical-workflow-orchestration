@@ -1,0 +1,45 @@
+{{- $c := .Values.cwo -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "cwo.fullname" . }}
+  labels: {{- include "cwo.labels" . | nindent 4 }}
+data:
+  CWO_ENVIRONMENT: {{ $c.environment | quote }}
+  CWO_PUBLIC_URL: {{ required "cwo.publicUrl is required" $c.publicUrl | quote }}
+  CWO_AGENT_ID: {{ required "cwo.agentId is required" $c.agentId | quote }}
+  CWO_FHIR_BASE_URL: {{ required "cwo.fhir.baseUrl is required" $c.fhir.baseUrl | quote }}
+  CWO_SMART_CLIENT_ID: {{ required "cwo.fhir.smartClientId is required" $c.fhir.smartClientId | quote }}
+  CWO_SMART_KEY_ID: {{ required "cwo.fhir.smartKeyId is required" $c.fhir.smartKeyId | quote }}
+  CWO_SMART_ALGORITHM: {{ $c.fhir.smartAlgorithm | quote }}
+  CWO_SMART_PRIVATE_KEY_FILE: /etc/clinical-workflow/smart/smart.pem
+  {{- with $c.fhir.smartTokenUrl }}
+  CWO_SMART_TOKEN_URL: {{ . | quote }}
+  {{- end }}
+  CWO_IDENTIFIER_SYSTEM: {{ required "cwo.fhir.identifierSystem is required" $c.fhir.identifierSystem | quote }}
+  CWO_SIGNING_KEY_FILE: {{ printf "/etc/clinical-workflow/signing/%s" (required "secrets.signingKeyFile is required" .Values.secrets.signingKeyFile) | quote }}
+  CWO_USER_ISSUER: {{ required "cwo.users.issuer is required" $c.users.issuer | quote }}
+  CWO_USER_AUDIENCE: {{ required "cwo.users.audience is required" $c.users.audience | quote }}
+  CWO_USER_JWKS_URL: {{ required "cwo.users.jwksUrl is required" $c.users.jwksUrl | quote }}
+  CWO_USER_ROLES_CLAIM: {{ $c.users.rolesClaim | quote }}
+  CWO_USER_FHIR_USER_CLAIM: {{ $c.users.fhirUserClaim | quote }}
+  CWO_IDENTITY_FABRIC_URL: {{ required "cwo.identityFabric.url is required" $c.identityFabric.url | quote }}
+  CWO_WORKLOAD_TOKEN_FILE: /var/run/secrets/tokens/identity-fabric
+  CWO_AZURE_OPENAI_ENDPOINT: {{ required "cwo.models.azureOpenAI.endpoint is required" $c.models.azureOpenAI.endpoint | quote }}
+  CWO_AZURE_OPENAI_DEPLOYMENT: {{ required "cwo.models.azureOpenAI.deployment is required" $c.models.azureOpenAI.deployment | quote }}
+  CWO_AZURE_OPENAI_MODEL: {{ required "cwo.models.azureOpenAI.model is required" $c.models.azureOpenAI.model | quote }}
+  CWO_AZURE_REGION: {{ required "cwo.models.azureOpenAI.region is required" $c.models.azureOpenAI.region | quote }}
+  CWO_AZURE_OPENAI_INPUT_COST_PER_MTOK: {{ required "cwo.models.azureOpenAI.inputCostPerMtok is required" $c.models.azureOpenAI.inputCostPerMtok | quote }}
+  CWO_AZURE_OPENAI_OUTPUT_COST_PER_MTOK: {{ required "cwo.models.azureOpenAI.outputCostPerMtok is required" $c.models.azureOpenAI.outputCostPerMtok | quote }}
+  CWO_SELF_HOSTED_LLM_URL: {{ required "cwo.models.selfHosted.url is required" $c.models.selfHosted.url | quote }}
+  CWO_SELF_HOSTED_MODEL: {{ required "cwo.models.selfHosted.model is required" $c.models.selfHosted.model | quote }}
+  CWO_MAX_REVISIONS: {{ $c.execution.maxRevisions | quote }}
+  CWO_LEASE_SECONDS: {{ $c.execution.leaseSeconds | quote }}
+  CWO_SWEEP_INTERVAL_SECONDS: {{ $c.execution.sweepIntervalSeconds | quote }}
+  CWO_MAX_AUTO_RETRIES: {{ $c.execution.maxAutoRetries | quote }}
+  CWO_RETRY_BASE_SECONDS: {{ $c.execution.retryBaseSeconds | quote }}
+  CWO_RUNNER_CONCURRENCY: {{ $c.execution.runnerConcurrency | quote }}
+  CWO_LOG_LEVEL: {{ $c.logLevel | quote }}
+  {{- with $c.otlpEndpoint }}
+  CWO_OTLP_ENDPOINT: {{ . | quote }}
+  {{- end }}

@@ -1,0 +1,66 @@
+{
+  "$defs": {
+    "FindingSummary": {
+      "properties": {
+        "check": {
+          "title": "Check",
+          "type": "string"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "severity": {
+          "$ref": "#/$defs/Severity"
+        }
+      },
+      "required": [
+        "id",
+        "check",
+        "severity",
+        "message"
+      ],
+      "title": "FindingSummary",
+      "type": "object"
+    },
+    "Severity": {
+      "enum": [
+        "error",
+        "warning",
+        "info"
+      ],
+      "title": "Severity",
+      "type": "string"
+    }
+  },
+  "$id": "https://github.com/kogunlowo123/clinical-workflow-orchestration/schemas/medication-check.response.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "findings": {
+      "items": {
+        "$ref": "#/$defs/FindingSummary"
+      },
+      "title": "Findings",
+      "type": "array"
+    },
+    "patient_id": {
+      "title": "Patient Id",
+      "type": "string"
+    },
+    "safe_to_propose": {
+      "title": "Safe To Propose",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "patient_id",
+    "safe_to_propose",
+    "findings"
+  ],
+  "title": "MedicationCheckResult",
+  "type": "object"
+}

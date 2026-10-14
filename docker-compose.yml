@@ -1,0 +1,104 @@
+# Local development stack: orchestrator + PostgreSQL + HAPI FHIR (seeded with a
+# synthetic patient) + Ollama serving a local model + an OIDC provider standing
+# in for both the clinician IdP and the agent credential issuer + an OTel
+# collector. Uses an in-memory signing key (CWO_DEV_EPHEMERAL_KEYS); never use
+# this configuration outside a developer workstation. All data is synthetic.
+name: clinical-workflow-orchestration
+
+services:
+  postgres:
+    image: postgres:16.4-alpine
+    environment:
+      POSTGRES_DB: cwo
+      POSTGRES_USER: cwo
+      POSTGRES_PASSWORD: cwo-local-only
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cwo -d cwo"]
+      interval: 5s
+      retries: 10
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  fhir:
+    image: hapiproject/hapi:v7.4.0
+    environment:
+      hapi.fhir.fhir_version: R4
+      hapi.fhir.client_id_strategy: ANY
+      hapi.fhir.allow_external_references: "true"
+    ports:
+      - "8090:8080"
+
+  fhir-seed:
+    image: curlimages/curl:8.10.1
+    depends_on:
+      fhir:
+        condition: service_started
+    volumes:
+      - ./deployments/docker/fhir-seed:/seed:ro
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >
+        until curl -sf http://fhir:8080/fhir/metadata > /dev/null; do sleep 3; done;
+        curl -sf -X POST -H 'Content-Type: application/fhir+json'
+        --data @/seed/synthetic-heart-failure-discharge.json http://fhir:8080/fhir > /dev/null
+        && echo seeded
+
+  ollama:
+    image: ollama/ollama:0.3.14
+    volumes:
+      - ollama:/root/.ollama
+
+  ollama-pull:
+    image: ollama/ollama:0.3.14
+    depends_on: [ollama]
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+    entrypoint: ["ollama", "pull", "llama3.1:8b"]
+
+  oidc:
+    image: ghcr.io/navikt/mock-oauth2-server:2.1.10
+    environment:
+      SERVER_PORT: "8080"
+    ports:
+      - "8081:8080"
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.111.0
+    command: ["--config=/etc/otelcol/config.yaml"]
+    volumes:
+      - ./deployments/docker/otel-collector.yaml:/etc/otelcol/config.yaml:ro
+
+  cwo:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+      fhir-seed:
+        condition: service_completed_successfully
+      ollama-pull:
+        condition: service_completed_successfully
+      oidc:
+        condition: service_started
+    ports:
+      - "8080:8080"
+    environment:
+      CWO_ENVIRONMENT: development
+      CWO_DEV_EPHEMERAL_KEYS: "true"
+      CWO_PUBLIC_URL: http://localhost:8080
+      CWO_DATABASE_URL: postgresql+asyncpg://cwo:cwo-local-only@postgres:5432/cwo
+      CWO_FHIR_BASE_URL: http://fhir:8080/fhir
+      CWO_PROVIDERS_FILE: /app/configs/providers.local.yaml
+      CWO_AGENT_ID: spiffe://agents.local/agent/clinical/orchestrator
+      CWO_USER_ISSUER: http://oidc:8080/clinicians
+      CWO_USER_AUDIENCE: clinical-workflow-orchestration
+      CWO_USER_JWKS_URL: http://oidc:8080/clinicians/jwks
+      CWO_AGENT_TOKEN_ISSUER: http://oidc:8080/agents
+      CWO_AGENT_TOKEN_AUDIENCE: clinical-workflow-orchestration
+      CWO_AGENT_JWKS_URL: http://oidc:8080/agents/jwks
+      CWO_AUDIT_LOG_PATH: /var/lib/clinical-workflow/audit/audit.jsonl
+      CWO_OTLP_ENDPOINT: http://otel-collector:4317
+      CWO_LOG_LEVEL: DEBUG
+
+volumes:
+  pgdata:
+  ollama:

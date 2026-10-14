@@ -1,0 +1,40 @@
+{
+  "$id": "https://github.com/kogunlowo123/clinical-workflow-orchestration/schemas/skill.start-care-workflow.input.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "encounter_id": {
+      "description": "FHIR Encounter id the care plan follows from",
+      "title": "Encounter Id",
+      "type": "string"
+    },
+    "idempotency_key": {
+      "anyOf": [
+        {
+          "maxLength": 200,
+          "minLength": 8,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Idempotency Key"
+    },
+    "purpose_of_use": {
+      "enum": [
+        "TREAT",
+        "HOPERAT"
+      ],
+      "title": "Purpose Of Use",
+      "type": "string"
+    }
+  },
+  "required": [
+    "encounter_id",
+    "purpose_of_use"
+  ],
+  "title": "StartWorkflowInput",
+  "type": "object"
+}

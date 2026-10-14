@@ -1,0 +1,77 @@
+{
+  "$defs": {
+    "Acknowledgement": {
+      "additionalProperties": false,
+      "properties": {
+        "finding_id": {
+          "maxLength": 300,
+          "minLength": 3,
+          "title": "Finding Id",
+          "type": "string"
+        },
+        "reason": {
+          "maxLength": 1000,
+          "minLength": 10,
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "finding_id",
+        "reason"
+      ],
+      "title": "Acknowledgement",
+      "type": "object"
+    },
+    "SignOffDecision": {
+      "enum": [
+        "approve",
+        "reject",
+        "request_changes"
+      ],
+      "title": "SignOffDecision",
+      "type": "string"
+    }
+  },
+  "$id": "https://github.com/kogunlowo123/clinical-workflow-orchestration/schemas/decision.request.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "acknowledgements": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/Acknowledgement"
+      },
+      "maxItems": 100,
+      "title": "Acknowledgements",
+      "type": "array"
+    },
+    "comment": {
+      "anyOf": [
+        {
+          "maxLength": 2000,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Comment"
+    },
+    "decision": {
+      "$ref": "#/$defs/SignOffDecision"
+    },
+    "draft_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Draft Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "decision",
+    "draft_digest"
+  ],
+  "title": "DecisionRequest",
+  "type": "object"
+}

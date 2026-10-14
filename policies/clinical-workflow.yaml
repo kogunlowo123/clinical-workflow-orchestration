@@ -1,0 +1,122 @@
+# Governance policy for clinical workflow orchestration.
+# Combining: deny overrides, then require_approval, then allow; default deny.
+#
+# Subjects
+#   kind=agent  attributes: scopes, action_in_scope, max_classification, delegated
+#   kind=user   attributes: roles (from the enterprise IdP), fhir_user (Practitioner/<id>)
+#   kind=service (this orchestrator committing to the EHR)
+# Actions
+#   workflow:start|read|list|resume|cancel   medication:check
+#   careplan:approve|reject|request-changes  fhir:write:careplan-bundle
+# risk: 1=LOW 2=MODERATE 3=HIGH 4=CRITICAL
+# classification: 0=PUBLIC 1=INTERNAL 2=CONFIDENTIAL 3=RESTRICTED (PHI)
+name: clinical-workflow
+version: "2026.10.0"
+rules:
+  # ------------------------------------------------ PHI access requires a purpose
+  - id: deny-phi-without-purpose
+    description: Restricted (PHI) resources require a declared purpose of use.
+    effect: deny
+    actions: ["workflow:*", "medication:*"]
+    conditions:
+      - {attribute: resource.classification, operator: gte, value: 3}
+      - {attribute: environment.purpose_of_use, operator: exists, value: false}
+
+  - id: deny-phi-for-unsupported-purpose
+    description: Only treatment and healthcare operations justify PHI access here.
+    effect: deny
+    actions: ["workflow:*", "medication:*"]
+    conditions:
+      - {attribute: resource.classification, operator: gte, value: 3}
+      - {attribute: environment.purpose_of_use, operator: not_in, value: [TREAT, HOPERAT]}
+
+  # ---------------------------------------------------------- agents (A2A / MCP)
+  - id: deny-delegated-agents-starting-workflows
+    description: A workflow is started by an agent acting on its own mandate, not a delegate.
+    effect: deny
+    actions: ["workflow:start", "workflow:resume", "workflow:cancel"]
+    conditions:
+      - {attribute: subject.kind, operator: eq, value: agent}
+      - {attribute: subject.delegated, operator: eq, value: true}
+
+  - id: allow-scoped-agent-actions
+    description: Agents may act within the scopes their credential carries.
+    effect: allow
+    actions: ["workflow:*", "medication:check"]
+    conditions:
+      - {attribute: subject.kind, operator: eq, value: agent}
+      - {attribute: subject.action_in_scope, operator: eq, value: true}
+
+  # ----------------------------------------------------------- people (REST API)
+  - id: allow-staff-read
+    effect: allow
+    actions: ["workflow:read", "workflow:list"]
+    conditions:
+      - {attribute: subject.kind, operator: eq, value: user}
+      - {attribute: subject.roles, operator: contains_any, value: [care-coordinator, clinician-approver, clinical-auditor]}
+
+  - id: allow-coordinators-operate
+    effect: allow
+    actions: ["workflow:start", "workflow:resume", "workflow:cancel", "medication:check"]
+    conditions:
+      - {attribute: subject.kind, operator: eq, value: user}
+      - {attribute: subject.roles, operator: contains_any, value: [care-coordinator, clinician-approver]}
+
+  # ------------------------------------------------------------ clinician sign-off
+  - id: deny-non-human-signoff
+    description: Only a person may approve, reject or return a care plan.
+    effect: deny
+    actions: ["careplan:*"]
+    conditions:
+      - {attribute: subject.kind, operator: ne, value: user}
+
+  - id: deny-signoff-without-practitioner
+    description: The signer must resolve to a FHIR Practitioner for Provenance.
+    effect: deny
+    actions: ["careplan:*"]
+    conditions:
+      - {attribute: subject.fhir_user, operator: exists, value: false}
+
+  - id: deny-self-approval
+    description: Separation of duties; the drafting identity cannot sign its own plan.
+    effect: deny
+    actions: ["careplan:approve"]
+    conditions:
+      - {attribute: subject.id, operator: eq_attr, value: resource.drafted_by}
+
+  - id: deny-approval-with-unacknowledged-errors
+    description: Every error-level validation finding must be acknowledged with a reason.
+    effect: deny
+    actions: ["careplan:approve"]
+    conditions:
+      - {attribute: resource.unacknowledged_errors, operator: gt, value: 0}
+
+  - id: allow-clinician-decisions
+    effect: allow
+    actions: ["careplan:approve", "careplan:reject", "careplan:request-changes"]
+    conditions:
+      - {attribute: subject.roles, operator: contains, value: clinician-approver}
+
+  # ------------------------------------------------------------------- EHR writes
+  - id: deny-ehr-write-with-unacknowledged-errors
+    description: A signature does not cover error-level findings the signer did not acknowledge.
+    effect: deny
+    actions: ["fhir:write:*"]
+    conditions:
+      - {attribute: environment.clinician_signed, operator: eq, value: true}
+      - {attribute: resource.unacknowledged_errors, operator: gt, value: 0}
+
+  - id: approve-unsigned-ehr-writes
+    description: Nothing is written to the patient record until a clinician signs.
+    effect: require_approval
+    actions: ["fhir:write:*"]
+    conditions:
+      - {attribute: environment.clinician_signed, operator: ne, value: true}
+
+  - id: allow-signed-ehr-writes
+    effect: allow
+    actions: ["fhir:write:careplan-bundle"]
+    conditions:
+      - {attribute: subject.kind, operator: eq, value: service}
+      - {attribute: environment.clinician_signed, operator: eq, value: true}
+      - {attribute: environment.signer, operator: exists, value: true}

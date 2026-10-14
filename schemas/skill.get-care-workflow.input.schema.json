@@ -1,0 +1,26 @@
+{
+  "$id": "https://github.com/kogunlowo123/clinical-workflow-orchestration/schemas/skill.get-care-workflow.input.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "purpose_of_use": {
+      "enum": [
+        "TREAT",
+        "HOPERAT"
+      ],
+      "title": "Purpose Of Use",
+      "type": "string"
+    },
+    "workflow_id": {
+      "pattern": "^[0-9a-f]{32}$",
+      "title": "Workflow Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "workflow_id",
+    "purpose_of_use"
+  ],
+  "title": "GetWorkflowInput",
+  "type": "object"
+}

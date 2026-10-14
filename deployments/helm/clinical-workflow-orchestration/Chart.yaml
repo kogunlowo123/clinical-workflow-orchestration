@@ -1,0 +1,13 @@
+apiVersion: v2
+name: clinical-workflow-orchestration
+description: Multi-agent clinical workflow orchestration on FHIR R4 with clinician sign-off
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+kubeVersion: ">=1.27.0-0"
+home: https://github.com/kogunlowo123/clinical-workflow-orchestration
+sources:
+  - https://github.com/kogunlowo123/clinical-workflow-orchestration
+maintainers:
+  - name: kogunlowo123
+    url: https://github.com/kogunlowo123

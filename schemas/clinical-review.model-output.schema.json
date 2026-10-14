@@ -1,0 +1,80 @@
+{
+  "$defs": {
+    "ModelConcern": {
+      "additionalProperties": false,
+      "properties": {
+        "activity_index": {
+          "anyOf": [
+            {
+              "maximum": 24,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Activity Index"
+        },
+        "category": {
+          "maxLength": 60,
+          "minLength": 2,
+          "title": "Category",
+          "type": "string"
+        },
+        "message": {
+          "maxLength": 1000,
+          "minLength": 5,
+          "title": "Message",
+          "type": "string"
+        },
+        "severity": {
+          "$ref": "#/$defs/Severity"
+        }
+      },
+      "required": [
+        "severity",
+        "category",
+        "message"
+      ],
+      "title": "ModelConcern",
+      "type": "object"
+    },
+    "Severity": {
+      "enum": [
+        "error",
+        "warning",
+        "info"
+      ],
+      "title": "Severity",
+      "type": "string"
+    }
+  },
+  "$id": "https://github.com/kogunlowo123/clinical-workflow-orchestration/schemas/clinical-review.model-output.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "The JSON object the clinical-review model must return.",
+  "properties": {
+    "concerns": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ModelConcern"
+      },
+      "maxItems": 20,
+      "title": "Concerns",
+      "type": "array"
+    },
+    "summary": {
+      "maxLength": 2000,
+      "minLength": 5,
+      "title": "Summary",
+      "type": "string"
+    }
+  },
+  "required": [
+    "summary"
+  ],
+  "title": "ClinicalReview",
+  "type": "object"
+}

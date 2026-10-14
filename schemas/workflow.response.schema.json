@@ -1,0 +1,1439 @@
+{
+  "$defs": {
+    "Acknowledgement": {
+      "additionalProperties": false,
+      "properties": {
+        "finding_id": {
+          "maxLength": 300,
+          "minLength": 3,
+          "title": "Finding Id",
+          "type": "string"
+        },
+        "reason": {
+          "maxLength": 1000,
+          "minLength": 10,
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "finding_id",
+        "reason"
+      ],
+      "title": "Acknowledgement",
+      "type": "object"
+    },
+    "ActivityKind": {
+      "enum": [
+        "follow-up",
+        "lab",
+        "referral",
+        "medication",
+        "education",
+        "monitoring"
+      ],
+      "title": "ActivityKind",
+      "type": "string"
+    },
+    "AllergyFact": {
+      "properties": {
+        "clinical_status": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Clinical Status"
+        },
+        "code": {
+          "$ref": "#/$defs/CodeableConcept"
+        },
+        "criticality": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Criticality"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "reactions": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Reactions",
+          "type": "array"
+        },
+        "verification_status": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Verification Status"
+        }
+      },
+      "required": [
+        "id",
+        "code",
+        "criticality",
+        "clinical_status",
+        "verification_status"
+      ],
+      "title": "AllergyFact",
+      "type": "object"
+    },
+    "CarePlanProposal": {
+      "additionalProperties": false,
+      "description": "The JSON object the care-coordination model must return.",
+      "properties": {
+        "activities": {
+          "items": {
+            "$ref": "#/$defs/ProposedActivity"
+          },
+          "maxItems": 25,
+          "minItems": 1,
+          "title": "Activities",
+          "type": "array"
+        },
+        "goals": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 10,
+          "minItems": 1,
+          "title": "Goals",
+          "type": "array"
+        },
+        "rationale": {
+          "maxLength": 4000,
+          "minLength": 10,
+          "title": "Rationale",
+          "type": "string"
+        },
+        "title": {
+          "maxLength": 200,
+          "minLength": 3,
+          "title": "Title",
+          "type": "string"
+        }
+      },
+      "required": [
+        "title",
+        "goals",
+        "activities",
+        "rationale"
+      ],
+      "title": "CarePlanProposal",
+      "type": "object"
+    },
+    "CodeableConcept": {
+      "properties": {
+        "coding": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Coding"
+          },
+          "title": "Coding",
+          "type": "array"
+        },
+        "text": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Text"
+        }
+      },
+      "title": "CodeableConcept",
+      "type": "object"
+    },
+    "Coding": {
+      "properties": {
+        "code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Code"
+        },
+        "display": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Display"
+        },
+        "system": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "System"
+        }
+      },
+      "title": "Coding",
+      "type": "object"
+    },
+    "CommitResult": {
+      "properties": {
+        "bundle_digest": {
+          "title": "Bundle Digest",
+          "type": "string"
+        },
+        "care_plan": {
+          "title": "Care Plan",
+          "type": "string"
+        },
+        "committed_at": {
+          "format": "date-time",
+          "title": "Committed At",
+          "type": "string"
+        },
+        "provenance": {
+          "title": "Provenance",
+          "type": "string"
+        },
+        "tasks": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Tasks",
+          "type": "array"
+        }
+      },
+      "required": [
+        "care_plan",
+        "tasks",
+        "provenance",
+        "committed_at",
+        "bundle_digest"
+      ],
+      "title": "CommitResult",
+      "type": "object"
+    },
+    "ConditionFact": {
+      "properties": {
+        "clinical_status": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Clinical Status"
+        },
+        "code": {
+          "$ref": "#/$defs/CodeableConcept"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "onset": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Onset"
+        }
+      },
+      "required": [
+        "id",
+        "code",
+        "clinical_status",
+        "onset"
+      ],
+      "title": "ConditionFact",
+      "type": "object"
+    },
+    "Decision": {
+      "description": "Outcome of a policy or security evaluation.",
+      "enum": [
+        "allow",
+        "deny",
+        "require_approval"
+      ],
+      "title": "Decision",
+      "type": "string"
+    },
+    "DraftView": {
+      "properties": {
+        "digest": {
+          "description": "Send back as draft_digest when deciding",
+          "title": "Digest",
+          "type": "string"
+        },
+        "drafted_at": {
+          "format": "date-time",
+          "title": "Drafted At",
+          "type": "string"
+        },
+        "drafted_by": {
+          "title": "Drafted By",
+          "type": "string"
+        },
+        "evidence_digest": {
+          "title": "Evidence Digest",
+          "type": "string"
+        },
+        "model": {
+          "$ref": "#/$defs/ModelProvenance"
+        },
+        "proposal": {
+          "$ref": "#/$defs/CarePlanProposal"
+        },
+        "revision": {
+          "title": "Revision",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "revision",
+        "digest",
+        "proposal",
+        "drafted_by",
+        "drafted_at",
+        "evidence_digest",
+        "model"
+      ],
+      "title": "DraftView",
+      "type": "object"
+    },
+    "EncounterFact": {
+      "properties": {
+        "class_code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Class Code"
+        },
+        "discharge_disposition": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Discharge Disposition"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "period_end": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Period End"
+        },
+        "period_start": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Period Start"
+        },
+        "status": {
+          "title": "Status",
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/$defs/CodeableConcept"
+        }
+      },
+      "required": [
+        "id",
+        "status",
+        "class_code",
+        "type",
+        "period_start",
+        "period_end",
+        "discharge_disposition"
+      ],
+      "title": "EncounterFact",
+      "type": "object"
+    },
+    "EvidencePacket": {
+      "properties": {
+        "age_band": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Age Band"
+        },
+        "allergies": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/AllergyFact"
+          },
+          "title": "Allergies",
+          "type": "array"
+        },
+        "conditions": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ConditionFact"
+          },
+          "title": "Conditions",
+          "type": "array"
+        },
+        "encounter": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EncounterFact"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "medications": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/MedicationFact"
+          },
+          "title": "Medications",
+          "type": "array"
+        },
+        "observations": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ObservationFact"
+          },
+          "title": "Observations",
+          "type": "array"
+        },
+        "open_work": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/OpenWorkFact"
+          },
+          "title": "Open Work",
+          "type": "array"
+        },
+        "patient_id": {
+          "title": "Patient Id",
+          "type": "string"
+        },
+        "retrieved_at": {
+          "format": "date-time",
+          "title": "Retrieved At",
+          "type": "string"
+        },
+        "retrieved_by": {
+          "title": "Retrieved By",
+          "type": "string"
+        },
+        "sex": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Sex"
+        },
+        "sources": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SourceDigest"
+          },
+          "title": "Sources",
+          "type": "array"
+        }
+      },
+      "required": [
+        "patient_id",
+        "age_band",
+        "sex",
+        "encounter",
+        "retrieved_at",
+        "retrieved_by"
+      ],
+      "title": "EvidencePacket",
+      "type": "object"
+    },
+    "Failure": {
+      "properties": {
+        "attempts": {
+          "minimum": 1,
+          "title": "Attempts",
+          "type": "integer"
+        },
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "failed_at": {
+          "format": "date-time",
+          "title": "Failed At",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "next_retry_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Next Retry At"
+        },
+        "retryable": {
+          "title": "Retryable",
+          "type": "boolean"
+        },
+        "step": {
+          "$ref": "#/$defs/WorkflowState"
+        }
+      },
+      "required": [
+        "step",
+        "code",
+        "message",
+        "retryable",
+        "attempts",
+        "failed_at"
+      ],
+      "title": "Failure",
+      "type": "object"
+    },
+    "FindingSource": {
+      "enum": [
+        "deterministic",
+        "model-review"
+      ],
+      "title": "FindingSource",
+      "type": "string"
+    },
+    "MedicationAction": {
+      "enum": [
+        "start",
+        "stop",
+        "continue",
+        "adjust"
+      ],
+      "title": "MedicationAction",
+      "type": "string"
+    },
+    "MedicationFact": {
+      "properties": {
+        "authored_on": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Authored On"
+        },
+        "dosage": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Dosage"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "medication": {
+          "$ref": "#/$defs/CodeableConcept"
+        },
+        "status": {
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "medication",
+        "status",
+        "dosage",
+        "authored_on"
+      ],
+      "title": "MedicationFact",
+      "type": "object"
+    },
+    "MedicationProposal": {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "$ref": "#/$defs/MedicationAction"
+        },
+        "display": {
+          "description": "Drug, strength and form",
+          "maxLength": 200,
+          "minLength": 2,
+          "title": "Display",
+          "type": "string"
+        },
+        "existing_request_id": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z0-9\\-.]{1,64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Required for stop/continue/adjust: the active MedicationRequest id",
+          "title": "Existing Request Id"
+        },
+        "rxnorm_code": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9]{1,10}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rxnorm Code"
+        }
+      },
+      "required": [
+        "action",
+        "display"
+      ],
+      "title": "MedicationProposal",
+      "type": "object"
+    },
+    "ModelProvenance": {
+      "properties": {
+        "attempts": {
+          "title": "Attempts",
+          "type": "integer"
+        },
+        "cost_usd": {
+          "title": "Cost Usd",
+          "type": "number"
+        },
+        "input_tokens": {
+          "title": "Input Tokens",
+          "type": "integer"
+        },
+        "model": {
+          "title": "Model",
+          "type": "string"
+        },
+        "output_digest": {
+          "title": "Output Digest",
+          "type": "string"
+        },
+        "output_tokens": {
+          "title": "Output Tokens",
+          "type": "integer"
+        },
+        "provider": {
+          "title": "Provider",
+          "type": "string"
+        },
+        "request_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Request Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "provider",
+        "model",
+        "request_ids",
+        "input_tokens",
+        "output_tokens",
+        "cost_usd",
+        "attempts",
+        "output_digest"
+      ],
+      "title": "ModelProvenance",
+      "type": "object"
+    },
+    "ObservationFact": {
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/CodeableConcept"
+        },
+        "effective": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Effective"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "interpretation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Interpretation"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Unit"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "id",
+        "code",
+        "value",
+        "unit",
+        "effective",
+        "interpretation"
+      ],
+      "title": "ObservationFact",
+      "type": "object"
+    },
+    "OpenWorkFact": {
+      "description": "An existing active CarePlan or open Task, so drafts do not duplicate work.",
+      "properties": {
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "resource_type": {
+          "title": "Resource Type",
+          "type": "string"
+        },
+        "status": {
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "resource_type",
+        "status",
+        "description"
+      ],
+      "title": "OpenWorkFact",
+      "type": "object"
+    },
+    "PolicyRecord": {
+      "description": "A policy decision as recorded on the workflow (which policy, which rules, why).",
+      "properties": {
+        "action": {
+          "title": "Action",
+          "type": "string"
+        },
+        "decided_at": {
+          "format": "date-time",
+          "title": "Decided At",
+          "type": "string"
+        },
+        "decision": {
+          "$ref": "#/$defs/Decision"
+        },
+        "matched_rules": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Matched Rules",
+          "type": "array"
+        },
+        "policy_digest": {
+          "title": "Policy Digest",
+          "type": "string"
+        },
+        "policy_name": {
+          "title": "Policy Name",
+          "type": "string"
+        },
+        "policy_version": {
+          "title": "Policy Version",
+          "type": "string"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "action",
+        "decision",
+        "matched_rules",
+        "policy_name",
+        "policy_version",
+        "policy_digest",
+        "reason",
+        "decided_at"
+      ],
+      "title": "PolicyRecord",
+      "type": "object"
+    },
+    "Priority": {
+      "enum": [
+        "routine",
+        "urgent",
+        "asap",
+        "stat"
+      ],
+      "title": "Priority",
+      "type": "string"
+    },
+    "ProposedActivity": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "anyOf": [
+            {
+              "maxLength": 32,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "LOINC code for labs, SNOMED for others",
+          "title": "Code"
+        },
+        "description": {
+          "maxLength": 500,
+          "minLength": 3,
+          "title": "Description",
+          "type": "string"
+        },
+        "due_in_days": {
+          "maximum": 365,
+          "minimum": 0,
+          "title": "Due In Days",
+          "type": "integer"
+        },
+        "kind": {
+          "$ref": "#/$defs/ActivityKind"
+        },
+        "medication": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MedicationProposal"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "priority": {
+          "$ref": "#/$defs/Priority",
+          "default": "routine"
+        },
+        "reason_refs": {
+          "default": [],
+          "description": "Ids of Conditions or Observations in the evidence that justify the activity",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 10,
+          "title": "Reason Refs",
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "description",
+        "due_in_days"
+      ],
+      "title": "ProposedActivity",
+      "type": "object"
+    },
+    "ReviewStatus": {
+      "enum": [
+        "completed",
+        "unavailable"
+      ],
+      "title": "ReviewStatus",
+      "type": "string"
+    },
+    "Severity": {
+      "enum": [
+        "error",
+        "warning",
+        "info"
+      ],
+      "title": "Severity",
+      "type": "string"
+    },
+    "SignOff": {
+      "properties": {
+        "acknowledgements": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Acknowledgement"
+          },
+          "title": "Acknowledgements",
+          "type": "array"
+        },
+        "comment": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Comment"
+        },
+        "decision": {
+          "$ref": "#/$defs/SignOffDecision"
+        },
+        "draft_digest": {
+          "title": "Draft Digest",
+          "type": "string"
+        },
+        "practitioner": {
+          "description": "FHIR reference of the signer, e.g. Practitioner/123",
+          "title": "Practitioner",
+          "type": "string"
+        },
+        "signature": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Compact JWS over the sign-off",
+          "title": "Signature"
+        },
+        "signature_key_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Signature Key Id"
+        },
+        "signed_at": {
+          "format": "date-time",
+          "title": "Signed At",
+          "type": "string"
+        },
+        "subject": {
+          "description": "Identity-provider subject of the signer",
+          "title": "Subject",
+          "type": "string"
+        },
+        "token_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "jti of the signer's access token",
+          "title": "Token Id"
+        }
+      },
+      "required": [
+        "decision",
+        "practitioner",
+        "subject",
+        "signed_at",
+        "draft_digest"
+      ],
+      "title": "SignOff",
+      "type": "object"
+    },
+    "SignOffDecision": {
+      "enum": [
+        "approve",
+        "reject",
+        "request_changes"
+      ],
+      "title": "SignOffDecision",
+      "type": "string"
+    },
+    "SourceDigest": {
+      "properties": {
+        "digest": {
+          "title": "Digest",
+          "type": "string"
+        },
+        "reference": {
+          "title": "Reference",
+          "type": "string"
+        },
+        "version_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Version Id"
+        }
+      },
+      "required": [
+        "reference",
+        "digest"
+      ],
+      "title": "SourceDigest",
+      "type": "object"
+    },
+    "Transition": {
+      "properties": {
+        "actor": {
+          "title": "Actor",
+          "type": "string"
+        },
+        "at": {
+          "format": "date-time",
+          "title": "At",
+          "type": "string"
+        },
+        "from_state": {
+          "$ref": "#/$defs/WorkflowState"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        },
+        "to_state": {
+          "$ref": "#/$defs/WorkflowState"
+        }
+      },
+      "required": [
+        "from_state",
+        "to_state",
+        "at",
+        "actor",
+        "reason"
+      ],
+      "title": "Transition",
+      "type": "object"
+    },
+    "ValidationFinding": {
+      "properties": {
+        "activity_index": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Activity Index"
+        },
+        "check": {
+          "title": "Check",
+          "type": "string"
+        },
+        "evidence_refs": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "id": {
+          "description": "Stable id: check plus subject; used to acknowledge the finding",
+          "title": "Id",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "severity": {
+          "$ref": "#/$defs/Severity"
+        },
+        "source": {
+          "$ref": "#/$defs/FindingSource"
+        }
+      },
+      "required": [
+        "id",
+        "check",
+        "severity",
+        "source",
+        "message"
+      ],
+      "title": "ValidationFinding",
+      "type": "object"
+    },
+    "ValidationOutcome": {
+      "enum": [
+        "passed",
+        "needs_attention",
+        "blocked"
+      ],
+      "title": "ValidationOutcome",
+      "type": "string"
+    },
+    "ValidationReport": {
+      "properties": {
+        "draft_digest": {
+          "title": "Draft Digest",
+          "type": "string"
+        },
+        "findings": {
+          "items": {
+            "$ref": "#/$defs/ValidationFinding"
+          },
+          "title": "Findings",
+          "type": "array"
+        },
+        "review_model": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ModelProvenance"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "review_status": {
+          "$ref": "#/$defs/ReviewStatus"
+        },
+        "review_summary": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Review Summary"
+        },
+        "ruleset_version": {
+          "title": "Ruleset Version",
+          "type": "string"
+        },
+        "validated_at": {
+          "format": "date-time",
+          "title": "Validated At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "draft_digest",
+        "ruleset_version",
+        "findings",
+        "review_status",
+        "validated_at"
+      ],
+      "title": "ValidationReport",
+      "type": "object"
+    },
+    "ValidationView": {
+      "properties": {
+        "outcome": {
+          "$ref": "#/$defs/ValidationOutcome"
+        },
+        "report": {
+          "$ref": "#/$defs/ValidationReport"
+        }
+      },
+      "required": [
+        "outcome",
+        "report"
+      ],
+      "title": "ValidationView",
+      "type": "object"
+    },
+    "WorkflowState": {
+      "enum": [
+        "pending",
+        "retrieving_evidence",
+        "drafting",
+        "validating",
+        "awaiting_approval",
+        "committing",
+        "completed",
+        "rejected",
+        "failed",
+        "cancelled"
+      ],
+      "title": "WorkflowState",
+      "type": "string"
+    }
+  },
+  "$id": "https://github.com/kogunlowo123/clinical-workflow-orchestration/schemas/workflow.response.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "approval": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/PolicyRecord"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "commit": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/CommitResult"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "created_by": {
+      "title": "Created By",
+      "type": "string"
+    },
+    "draft": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/DraftView"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "encounter_id": {
+      "title": "Encounter Id",
+      "type": "string"
+    },
+    "evidence": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/EvidencePacket"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "failure": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Failure"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "history": {
+      "items": {
+        "$ref": "#/$defs/Transition"
+      },
+      "title": "History",
+      "type": "array"
+    },
+    "patient_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Patient Id"
+    },
+    "revision": {
+      "title": "Revision",
+      "type": "integer"
+    },
+    "revision_feedback": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Revision Feedback",
+      "type": "array"
+    },
+    "signoff": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SignOff"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "state": {
+      "$ref": "#/$defs/WorkflowState"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    },
+    "validation": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ValidationView"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "workflow_id": {
+      "title": "Workflow Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "workflow_id",
+    "state",
+    "encounter_id",
+    "patient_id",
+    "created_by",
+    "created_at",
+    "updated_at",
+    "revision",
+    "revision_feedback",
+    "evidence",
+    "draft",
+    "validation",
+    "approval",
+    "signoff",
+    "commit",
+    "failure",
+    "history"
+  ],
+  "title": "WorkflowView",
+  "type": "object"
+}

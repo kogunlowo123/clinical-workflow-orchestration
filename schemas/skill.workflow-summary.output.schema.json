@@ -1,0 +1,152 @@
+{
+  "$defs": {
+    "ActivitySummary": {
+      "properties": {
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "due_in_days": {
+          "title": "Due In Days",
+          "type": "integer"
+        },
+        "kind": {
+          "title": "Kind",
+          "type": "string"
+        },
+        "priority": {
+          "title": "Priority",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "description",
+        "due_in_days",
+        "priority"
+      ],
+      "title": "ActivitySummary",
+      "type": "object"
+    },
+    "WorkflowState": {
+      "enum": [
+        "pending",
+        "retrieving_evidence",
+        "drafting",
+        "validating",
+        "awaiting_approval",
+        "committing",
+        "completed",
+        "rejected",
+        "failed",
+        "cancelled"
+      ],
+      "title": "WorkflowState",
+      "type": "string"
+    }
+  },
+  "$id": "https://github.com/kogunlowo123/clinical-workflow-orchestration/schemas/skill.workflow-summary.output.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "activities": {
+      "items": {
+        "$ref": "#/$defs/ActivitySummary"
+      },
+      "title": "Activities",
+      "type": "array"
+    },
+    "care_plan": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Care Plan"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "draft_digest": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Draft Digest"
+    },
+    "encounter_id": {
+      "title": "Encounter Id",
+      "type": "string"
+    },
+    "error_findings": {
+      "default": 0,
+      "title": "Error Findings",
+      "type": "integer"
+    },
+    "failure_code": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Failure Code"
+    },
+    "revision": {
+      "title": "Revision",
+      "type": "integer"
+    },
+    "state": {
+      "$ref": "#/$defs/WorkflowState"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    },
+    "validation_outcome": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Validation Outcome"
+    },
+    "warning_findings": {
+      "default": 0,
+      "title": "Warning Findings",
+      "type": "integer"
+    },
+    "workflow_id": {
+      "title": "Workflow Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "workflow_id",
+    "state",
+    "encounter_id",
+    "created_at",
+    "updated_at",
+    "revision"
+  ],
+  "title": "WorkflowSummary",
+  "type": "object"
+}
